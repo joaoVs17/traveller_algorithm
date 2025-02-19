@@ -5,9 +5,10 @@ import random
 class Ant:
   id = 0
   def __init__(self, city: int):
-    self.city = city
+    self.city: int = city
+    self.travelling: bool = False
     self.last_path: List[int] = []
-    self.currentPath: set[int] = set()
+    self.currentPath: List[int] = []
 
   def calcTravelProbability(self, cityA: int, cityB: int, graph: Graph, feromoneInfluence: float, visibilityInfluence: float):
     edgeFeromone: float = graph.scoreMatrix[cityA][cityB]
@@ -48,3 +49,20 @@ class Ant:
       acceptance: float = probabilityObj[chosenCity] / maxProbability
       if random.random() <= acceptance:
         return chosenCity
+  
+  def travel(self, graph: Graph) -> None:
+    self.currentPath.append(self.city)
+    while True:
+      self.travelling = True
+      nextCity = self.pickNextCity(graph, self.city)
+      if (nextCity < 0):
+        self.city = self.currentPath[0]
+        self.last_path = self.currentPath
+        self.currentPath = []
+        break
+      self.city = nextCity
+      self.currentPath.append(nextCity)
+
+
+      
+    
