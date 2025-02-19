@@ -1,5 +1,6 @@
 from typing import List
 from entity.graph import Graph
+import random
 
 class Ant:
   id = 0
@@ -26,3 +27,24 @@ class Ant:
     probability: float = dividend/divider
     return probability
 
+  def pickNextCity(self, graph: Graph, currentCity: int) -> int:
+    
+    probabilityObj: dict[int, float]  = {}
+    maxProbability: float = 0
+    
+    for city in range(graph.matrix.columns):
+      if (city not in self.currentPath) and (city != currentCity):
+        probability: float = self.calcTravelProbability(currentCity, city, graph, 1, 2)
+        probabilityObj[city] = probability
+        maxProbability = max(maxProbability, probability)
+    
+    if not list(probabilityObj.keys()):
+      return -1
+    
+    while True:
+      #Ideia: usar as probabilidades como teto de aceitação. Um número é randomizado e, caso esteja dentro desse teto é escolhido
+      #Números maiores possuem, portanto, maior chance de serem escolhidos
+      chosenCity: int = random.choice(list(probabilityObj.keys()))
+      acceptance: float = probabilityObj[chosenCity] / maxProbability
+      if random.random() <= acceptance:
+        return chosenCity
