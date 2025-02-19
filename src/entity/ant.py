@@ -7,8 +7,10 @@ class Ant:
   def __init__(self, city: int):
     self.city: int = city
     self.travelling: bool = False
-    self.last_path: List[int] = []
+    self.lastPath: List[int] = []
+    self.lastPathDistance: float = 0
     self.currentPath: List[int] = []
+    self.currentPathDistance: float = 0
 
   def calcTravelProbability(self, cityA: int, cityB: int, graph: Graph, feromoneInfluence: float, visibilityInfluence: float):
     edgeFeromone: float = graph.scoreMatrix[cityA][cityB]
@@ -54,12 +56,17 @@ class Ant:
     self.currentPath.append(self.city)
     while True:
       self.travelling = True
-      nextCity = self.pickNextCity(graph, self.city)
+      nextCity: int = self.pickNextCity(graph, self.city)
       if (nextCity < 0):
+        self.currentPathDistance += graph.matrix[self.city][self.currentPath[0]]
         self.city = self.currentPath[0]
-        self.last_path = self.currentPath
+        self.currentPath.append(self.currentPath[0])
+        self.lastPath = self.currentPath
+        self.lastPathDistance = self.currentPathDistance
+        self.currentPathDistance = 0
         self.currentPath = []
         break
+      self.currentPathDistance += graph.matrix[self.city][nextCity]
       self.city = nextCity
       self.currentPath.append(nextCity)
 

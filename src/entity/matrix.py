@@ -24,7 +24,7 @@ class Matrix():
         cost_list = re.split(r'\s+', line.strip())
         lines.append(cost_list)
     matrix = cls(len(lines), len(lines[0]))
-    print(lines)
+    # print(lines)
     for l in range (0, matrix.lines):
       for c in range (0, matrix.columns):
         matrix[c][l] = float(lines[l][c])
