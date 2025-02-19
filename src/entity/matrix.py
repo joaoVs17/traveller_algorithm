@@ -3,8 +3,8 @@ from io import TextIOWrapper
 import re
 
 class Matrix():
-  def __init__(self, lines: int = 0, columns: int = 0) -> None :
-    self._value: List[List[float]] = self.initialize(lines, columns)
+  def __init__(self, lines: int = 0, columns: int = 0, initialValue: float = 1) -> None :
+    self._value: List[List[float]] = self.initialize(lines, columns, initialValue)
     self.lines = lines
     self.columns = columns
 
@@ -40,7 +40,7 @@ class Matrix():
     self._value[index] = value
   
   @classmethod
-  def initialize(cls, lines: int = 0, columns: int = 0, fill = 0) -> List[List[float]]:
+  def initialize(cls, lines: int = 0, columns: int = 0, fill: float = 0) -> List[List[float]]:
     return [[fill for _ in range(columns)] for _ in range(lines)]
   
   def fill(self, filePath: str) -> None:
