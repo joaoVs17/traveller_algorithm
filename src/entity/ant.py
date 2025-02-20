@@ -1,7 +1,7 @@
 from typing import List
 from entity.graph import Graph
 import random
-
+from entity.matrix import Matrix
 class Ant:
   id = 0
   def __init__(self, city: int):
@@ -70,6 +70,17 @@ class Ant:
       self.city = nextCity
       self.currentPath.append(nextCity)
 
-
-      
-    
+  def genPheromeneDepositMatrix(self, graph: Graph) -> Matrix:
+    if (len(self.lastPath) <= graph.matrix.columns):
+      return Matrix(graph.matrix.lines, graph.matrix.columns, -1)
+    pheromoneMatrix: Matrix = Matrix(graph.matrix.lines, graph.matrix.columns, 0)
+    pheromone: float = self.calcPheromoneToBeDeposited() #é o feromônio que vai ser depositado
+    for i in range(len(self.lastPath) -1): #não quero chegar ao último item do array
+      pheromoneMatrix[self.lastPath[i]][self.lastPath[i+1]] = pheromone
+      pheromoneMatrix[self.lastPath[i+1]][self.lastPath[i]] = pheromone
+    return pheromoneMatrix
+  
+  def calcPheromoneToBeDeposited(self) -> float:
+    if (self.lastPathDistance <= 0):
+      return -1
+    return 1/self.lastPathDistance
