@@ -9,3 +9,9 @@ class Aco:
     self.ants: List[Ant] = []
     self.ants.append(Ant(0))
     self.decayRate = 0.5
+
+  def decayPheromone(self):
+    for line in range(0,self.graph.scoreMatrix.lines):
+      for col in range(0,self.graph.scoreMatrix.columns):
+        self.graph.scoreMatrix[line][col] = (1 - self.decayRate) * self.graph.scoreMatrix[line][col]
+
