@@ -1,5 +1,4 @@
-from typing import List, TypeVar
-from io import TextIOWrapper
+from typing import List
 import re
 
 class Matrix():
@@ -21,11 +20,12 @@ class Matrix():
           cost_list: List[str] = re.split(r'\s+', line.strip())
           lines.append(cost_list)
 
-    matrix = cls(len(lines), len(lines[0]))
-    # print(lines)
-    for l in range (0, matrix.lines):
-      for c in range (0, matrix.columns):
-        matrix[c][l] = float(lines[l][c])
+    matrix = cls(len(lines), len(lines[0])) #não tenho certeza ainda de como tipar isso
+    
+    for line in range (matrix.lines):
+      for col in range (matrix.columns):
+        matrix[col][line] = float(lines[line][col])
+    
     return matrix
   
   def __repr__(self) -> str:
@@ -40,8 +40,4 @@ class Matrix():
   @classmethod
   def initialize(cls, lines: int = 0, columns: int = 0, fill: float = 0) -> List[List[float]]:
     return [[fill for _ in range(columns)] for _ in range(lines)]
-  
-  def fill(self, filePath: str) -> None:
-    """Must fill the matriz based on a adjacence matrix"""
-    pass
   
