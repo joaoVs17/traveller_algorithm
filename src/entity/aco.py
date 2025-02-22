@@ -1,37 +1,47 @@
 from entity.graph import Graph
 from entity.ant import Ant
 from typing import List
-from entity.matrix import Matrix
+from entity.npmatrix import Matrix
+import multiprocessing as mp
+import random
 
 class Aco:
-  def __init__(self, filePath: str):
+  def __init__(self, filePath: str, ants: int = 0):
     self.graph: Graph = Graph(filePath)
     self.ants: List[Ant] = []
-    for i in range(self.graph.matrix.columns):
-      self.ants.append(Ant(i))
+    if ants <= 0 or ants >= self.graph.matrix.columns: 
+      ants = self.graph.matrix.columns-1
+    for i in range(ants):
+      self.ants.append(Ant(random.randint(0, self.graph.matrix.columns-1)))
     self.decayRate = 0.5
     self.currentBestPath: List[int] = []
     self.currentBestPathDistance: float = -1
     self.bestAnt: Ant
 
   def decayPheromone(self):
-    for line in range(0,self.graph.scoreMatrix.lines):
-      for col in range(0,self.graph.scoreMatrix.columns):
-        self.graph.scoreMatrix[line][col] = (1 - self.decayRate) * self.graph.scoreMatrix[line][col]
+    self.graph.scoreMatrix *= (1 - self.decayRate)
 
   def layNewPheromone(self):
     for ant in self.ants:
-      pheromoneMatrix: Matrix = ant.genPheromeneDepositMatrix(self.graph)
-      for line in range(0,self.graph.scoreMatrix.lines):
-        for col in range(0,self.graph.scoreMatrix.columns):
-          self.graph.scoreMatrix[line][col] += pheromoneMatrix[line][col]
-  
+      pheromoneMatrix: Matrix = ant.genPheromoneDepositMatrix(self.graph)
+      self.graph.scoreMatrix += pheromoneMatrix
+
   def makeAntsTour(self) -> None:
-    for ant in self.ants:
-      ant.travel(self.graph)
-    # self.decayPheromone()
+    with mp.Pool(4) as pool:
+        self.ants = pool.map(self.travelSingleAnt, self.ants)
+        
+    self.currentBestPath = Ant.bestPath
+    self.currentBestPathDistance = Ant.bestPathDistance
+
+    self.decayPheromone()
     self.layNewPheromone()
 
+    for ant in self.ants:
+      ant.city = random.randint(0, self.graph.matrix.columns-1)
+
+  def travelSingleAnt(self, ant: Ant) -> Ant:
+    ant.travel(self.graph)
+    return ant
 
   def getBestValues(self):
     for ant in self.ants:
@@ -40,7 +50,7 @@ class Aco:
         self.currentBestPath = ant.lastPath
 
   def startACO(self) -> None:
-    for i in range(0,2):
+    for i in range(0, 1000):
       self.makeAntsTour()
       self.getBestValues()
      

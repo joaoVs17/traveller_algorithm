@@ -1,8 +1,12 @@
 from typing import List
 from entity.graph import Graph
 import random
-from entity.matrix import Matrix
+from entity.npmatrix import Matrix
 class Ant:  
+
+  bestPath: List[int] = []
+  bestPathDistance: float = -1
+
   def __init__(self, city: int):
     self.city: int = city
     self.travelling: bool = False
@@ -56,6 +60,9 @@ class Ant:
 
         self.lastPath = self.currentPath
         self.lastPathDistance = self.currentPathDistance
+        if self.lastPathDistance < Ant.bestPathDistance or Ant.bestPathDistance < 0:
+          Ant.bestPathDistance = self.lastPathDistance
+          Ant.bestPath = self.lastPath
         self.currentPathDistance = 0
         self.currentPath = []
         break
@@ -64,7 +71,7 @@ class Ant:
       self.city = nextCity
       self.currentPath.append(nextCity)
 
-  def genPheromeneDepositMatrix(self, graph: Graph) -> Matrix:
+  def genPheromoneDepositMatrix(self, graph: Graph) -> Matrix:
     if (len(self.lastPath) <= graph.matrix.columns):
       return Matrix(graph.matrix.lines, graph.matrix.columns, -1)
     
