@@ -2,8 +2,7 @@ from typing import List
 from entity.graph import Graph
 import random
 from entity.matrix import Matrix
-class Ant:
-  id = 0
+class Ant:  
   def __init__(self, city: int):
     self.city: int = city
     self.travelling: bool = False
@@ -44,18 +43,23 @@ class Ant:
   
   def travel(self, graph: Graph) -> None:
     self.currentPath.append(self.city)
+    
     while True:
+
       self.travelling = True
       nextCity: int = self.pickNextCity(graph, self.city)
+    
       if (nextCity < 0):
         self.currentPathDistance += graph.matrix[self.city][self.currentPath[0]]
         self.city = self.currentPath[0]
         self.currentPath.append(self.currentPath[0])
+
         self.lastPath = self.currentPath
         self.lastPathDistance = self.currentPathDistance
         self.currentPathDistance = 0
         self.currentPath = []
         break
+
       self.currentPathDistance += graph.matrix[self.city][nextCity]
       self.city = nextCity
       self.currentPath.append(nextCity)
@@ -63,11 +67,14 @@ class Ant:
   def genPheromeneDepositMatrix(self, graph: Graph) -> Matrix:
     if (len(self.lastPath) <= graph.matrix.columns):
       return Matrix(graph.matrix.lines, graph.matrix.columns, -1)
+    
     pheromoneMatrix: Matrix = Matrix(graph.matrix.lines, graph.matrix.columns, 0)
     pheromone: float = self.calcPheromoneToBeDeposited() #é o feromônio que vai ser depositado
+    
     for i in range(len(self.lastPath) -1): #não quero chegar ao último item do array
-      pheromoneMatrix[self.lastPath[i]][self.lastPath[i+1]] = pheromone
-      pheromoneMatrix[self.lastPath[i+1]][self.lastPath[i]] = pheromone
+      a, b = self.lastPath[i], self.lastPath[i + 1] #Maneira simples do python de fazer as várias atribuições
+      pheromoneMatrix[a][b] = pheromoneMatrix[b][a] = pheromone
+    
     return pheromoneMatrix
   
   def calcPheromoneToBeDeposited(self) -> float:
