@@ -5,8 +5,8 @@ import re
 class Matrix():
   def __init__(self, lines: int = 0, columns: int = 0, initialValue: float = 1) -> None :
     self._value: List[List[float]] = self.initialize(lines, columns, initialValue)
-    self.lines = lines
-    self.columns = columns
+    self.lines: int = lines
+    self.columns: int = columns
 
   @property
   def value(self) -> List[List[float]]:
@@ -14,15 +14,13 @@ class Matrix():
   
   @classmethod
   def fromFile(cls, filePath: str) -> 'Matrix':
-    file: TextIOWrapper = open(filePath, 'r')
     lines: List[List[str]] = []
-    while True:
-      line: str = file.readline()
-      if (line == ""): 
-        break
-      if '#' not in line:
-        cost_list = re.split(r'\s+', line.strip())
-        lines.append(cost_list)
+    with open(filePath, 'r') as file:
+      for line in file:
+        if '#' not in line:
+          cost_list: List[str] = re.split(r'\s+', line.strip())
+          lines.append(cost_list)
+
     matrix = cls(len(lines), len(lines[0]))
     # print(lines)
     for l in range (0, matrix.lines):
