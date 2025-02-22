@@ -6,14 +6,17 @@ import multiprocessing as mp
 import random
 
 class Aco:
-  def __init__(self, filePath: str, ants: int = 0):
+  def __init__(self, filePath: str, ants: int = 0, decayRate = 0.5, iterations: int = 1):
     self.graph: Graph = Graph(filePath)
     self.ants: List[Ant] = []
+
     if ants <= 0 or ants >= self.graph.matrix.columns: 
       ants = self.graph.matrix.columns-1
     for i in range(ants):
       self.ants.append(Ant(random.randint(0, self.graph.matrix.columns-1)))
-    self.decayRate = 0.5
+    
+    self.decayRate = decayRate if (decayRate < 1 and decayRate > 0) else 0.5
+    self.iterations = iterations if iterations > 0 else 1
     self.currentBestPath: List[int] = []
     self.currentBestPathDistance: float = -1
     self.bestAnt: Ant
@@ -28,7 +31,7 @@ class Aco:
 
   def makeAntsTour(self) -> None:
     with mp.Pool(4) as pool:
-        self.ants = pool.map(self.travelSingleAnt, self.ants)
+      self.ants = pool.map(self.travelSingleAnt, self.ants)
         
     self.currentBestPath = Ant.bestPath
     self.currentBestPathDistance = Ant.bestPathDistance
@@ -50,7 +53,7 @@ class Aco:
         self.currentBestPath = ant.lastPath
 
   def startACO(self) -> None:
-    for i in range(0, 1000):
+    for i in range(0, 1):
       self.makeAntsTour()
       self.getBestValues()
      

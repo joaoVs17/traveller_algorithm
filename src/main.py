@@ -1,6 +1,11 @@
 from entity.aco import Aco
 import time
 
+PATH="/home/joao/Documentos/GitHub/traveller_algorithm/assets/lau15_dist.txt"
+ITERATIONS = 20
+ANT_NUMBER = 0
+DECAY_RATE = 0.5
+
 def registerTime(func):
   def wrapper(*args, **kwargs):
     startTime: float = time.perf_counter()
@@ -12,11 +17,12 @@ def registerTime(func):
 
 @registerTime
 def main():
-  aco: Aco = Aco("/home/joao/Documentos/GitHub/traveller_algorithm/assets/lau15_dist.txt", 0)
-  # aco: Aco = Aco("/home/joao/Documentos/GitHub/traveller_algorithm/assets/sgb128_dist.txt", 0)
+  aco: Aco = Aco(PATH, ANT_NUMBER, DECAY_RATE, ITERATIONS)
   aco.startACO()
-  print(aco.currentBestPath)
-  print(aco.currentBestPathDistance)
+  print("STARTED ACO ALGORITHM \n")
+  print("BEST ENCOUNTERED PATH: ", aco.currentBestPath, "")
+  print("DISTANCE OF PATH:", aco.currentBestPathDistance, "\n")
+  print("FINISHED ALGORITHM \n\n")
 
 
 if __name__ == "__main__":
