@@ -28,25 +28,19 @@ class Ant:
 
   def pickNextCity(self, graph: Graph, currentCity: int) -> int:
     
-    probabilityObj: dict[int, float]  = {}
-    maxProbability: float = 0
-    
-    for city in range(graph.matrix.columns):
-      if (city not in self.currentPath) and (city != currentCity):
-        probability: float = self.calcTravelProbability(currentCity, city, graph, 1, 2)
-        probabilityObj[city] = probability
-        maxProbability = max(maxProbability, probability)
+    probabilityObj: dict[int, float]  = {
+      city: self.calcTravelProbability(currentCity, city, graph, 1, 2)
+      for city in range(graph.matrix.columns)
+      if city not in self.currentPath and city != currentCity
+    }
     
     if not list(probabilityObj.keys()):
       return -1
     
-    while True:
-      #Ideia: usar as probabilidades como teto de aceitação. Um número é randomizado e, caso esteja dentro desse teto é escolhido
-      #Números maiores possuem, portanto, maior chance de serem escolhidos
-      chosenCity: int = random.choice(list(probabilityObj.keys()))
-      acceptance: float = probabilityObj[chosenCity] / maxProbability
-      if random.random() <= acceptance:
-        return chosenCity
+    #Ideia: usar as probabilidades como teto de aceitação. Um número é randomizado e, caso esteja dentro desse teto é escolhido
+    #Números maiores possuem, portanto, maior chance de serem escolhidos
+    cities, probabilities = zip(*probabilityObj.items()) #Separando cidades de probabilidades
+    return random.choices(cities, weights=probabilities, k=1)[0] #Python them função de escolha própria que leva em conta pesos
   
   def travel(self, graph: Graph) -> None:
     self.currentPath.append(self.city)
