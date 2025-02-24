@@ -2,27 +2,26 @@ from typing import List
 from entity.graph import Graph
 import random
 from entity.npmatrix import Matrix
+from multiprocessing import Manager, Lock, Pool
 class Ant:  
-
-  bestPath: List[int] = []
-  bestPathDistance: float = -1
-
-  def __init__(self, city: int):
+  def __init__(self, city: int, pheromoneInfluence: float = 1, visibilityInfluence: float = 2):
     self.city: int = city
     self.travelling: bool = False
     self.lastPath: List[int] = []
     self.lastPathDistance: float = 0
     self.currentPath: List[int] = []
     self.currentPathDistance: float = 0
+    self.pheromoneInfluence: float  = pheromoneInfluence
+    self.visibilityInfluence: float =  visibilityInfluence
 
-  def calcTravelProbability(self, cityA: int, cityB: int, graph: Graph, feromoneInfluence: float, visibilityInfluence: float):
-    edgeFeromone: float = graph.scoreMatrix[cityA][cityB]
+  def calcTravelProbability(self, cityA: int, cityB: int, graph: Graph, pheromoneInfluence: float, visibilityInfluence: float):
+    edgepheromone: float = graph.scoreMatrix[cityA][cityB]
     edgeVisibility: float = 1/graph.matrix[cityA][cityB] if graph.matrix[cityA][cityB] != 0 else 0
 
-    dividend: float = pow(edgeFeromone, feromoneInfluence) * pow(edgeVisibility, visibilityInfluence)
+    dividend: float = pow(edgepheromone, pheromoneInfluence) * pow(edgeVisibility, visibilityInfluence)
 
     divider: float = sum(
-      pow(graph.scoreMatrix[cityA][col], feromoneInfluence) * 
+      pow(graph.scoreMatrix[cityA][col], pheromoneInfluence) * 
       pow(1 / graph.matrix[cityA][col], visibilityInfluence) 
       for col in range(graph.matrix.columns) if col not in self.currentPath and col != cityA and graph.matrix[cityA][col] != 0
     )
@@ -32,7 +31,7 @@ class Ant:
   def pickNextCity(self, graph: Graph, currentCity: int) -> int:
     
     probabilityObj: dict[int, float]  = {
-      city: self.calcTravelProbability(currentCity, city, graph, 1, 2)
+      city: self.calcTravelProbability(currentCity, city, graph, self.pheromoneInfluence, self.visibilityInfluence)
       for city in range(graph.matrix.columns)
       if city not in self.currentPath and city != currentCity
     }
@@ -60,9 +59,6 @@ class Ant:
 
         self.lastPath = self.currentPath
         self.lastPathDistance = self.currentPathDistance
-        if self.lastPathDistance < Ant.bestPathDistance or Ant.bestPathDistance < 0:
-          Ant.bestPathDistance = self.lastPathDistance
-          Ant.bestPath = self.lastPath
         self.currentPathDistance = 0
         self.currentPath = []
         break
