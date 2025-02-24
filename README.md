@@ -1,5 +1,5 @@
 # traveller_algorithm
-Algorithm implementation for graphs studies
+Algorithm implementation only for graphs studies
 
 # ======================================================================
 # DOCUMENTAÇÃO
